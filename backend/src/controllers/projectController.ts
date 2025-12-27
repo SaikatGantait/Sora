@@ -24,3 +24,12 @@ export async function createProject(req: Request, res: Response) {
   const project = await prisma.project.create({ data: { name, templateId, data: JSON.stringify(data), userId } })
   res.json({ project })
 }
+
+export async function deleteProject(req: Request, res: Response) {
+  const userId = (req as any).userId as string
+  const { id } = req.params
+  const project = await prisma.project.findFirst({ where: { id, userId } })
+  if (!project) return res.status(404).json({ error: 'Not found' })
+  await prisma.project.delete({ where: { id } })
+  res.json({ ok: true })
+}

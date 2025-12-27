@@ -7,6 +7,7 @@ export default function ProjectsPage() {
   const { token } = useAuth()
   const [projects, setProjects] = useState<any[]>([])
   const [error, setError] = useState<string>("")
+  const [busy, setBusy] = useState<string>("")
 
   useEffect(() => {
     const load = async () => {
@@ -25,6 +26,19 @@ export default function ProjectsPage() {
     load()
   }, [token])
 
+  const onDelete = async (id: string) => {
+    if (!confirm('Delete this project?')) return
+    setBusy(id)
+    try {
+      const res = await authFetch(token, `${getApiBase()}/projects/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setProjects(prev => prev.filter(p => p.id !== id))
+      }
+    } finally {
+      setBusy("")
+    }
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-4">My Projects</h1>
@@ -38,6 +52,7 @@ export default function ProjectsPage() {
               <div className="text-sm text-zinc-400">{new Date(p.updatedAt).toLocaleString()}</div>
               <div className="font-medium">{p.name}</div>
               <a className="btn btn-secondary mt-3" href={`/editor/${p.templateId}?project=${p.id}`}>Open in Editor</a>
+              <button className="btn btn-secondary mt-3" onClick={()=>onDelete(p.id)} disabled={busy===p.id}>{busy===p.id? 'Deleting...' : 'Delete'}</button>
             </div>
           ))}
         </div>
