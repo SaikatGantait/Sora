@@ -19,6 +19,7 @@ export default function EditorPage() {
   const [jobId, setJobId] = useState<string | null>(null)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [saveMsg, setSaveMsg] = useState<string>('')
+  const [frame, setFrame] = useState<number>(0)
 
   useEffect(() => {
     // Protect route: if no token, redirect to login
@@ -103,9 +104,9 @@ export default function EditorPage() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
       <div className="xl:col-span-8 space-y-4">
-        <RemotionPreview template={{ ...template, layers }} />
+        <RemotionPreview template={{ ...template, layers }} frame={frame} setFrame={setFrame} />
         <CanvasEditor layers={layers} setLayers={setLayers} />
-        <Timeline duration={duration} layers={layers} setLayers={setLayers} />
+        <Timeline duration={duration} layers={layers} setLayers={setLayers} currentFrame={frame} setCurrentFrame={setFrame} />
       </div>
       <div className="xl:col-span-4">
         <div className="card p-4 space-y-4">
