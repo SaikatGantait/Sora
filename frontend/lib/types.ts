@@ -12,6 +12,8 @@ export type ImageLayer = {
   width: number
   height: number
   src?: string
+  start?: number
+  end?: number
 }
 export type TextLayer = {
   type: 'text'
@@ -21,6 +23,8 @@ export type TextLayer = {
   color: string
   x: number
   y: number
+  start?: number
+  end?: number
 }
 export type Layer = VideoLayer | ImageLayer | TextLayer
 
