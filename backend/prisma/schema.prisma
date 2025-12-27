@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // swap to postgresql if available
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Template {
+  id          String   @id
+  name        String
+  duration    Int
+  layers      String   // JSON stringified
+  previewUrl  String   @default("")
+  creatorName String   @default("SoraStudio")
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model RenderJob {
+  id        String   @id @default(cuid())
+  status    String
+  videoUrl  String?
+  createdAt DateTime @default(now())
+}

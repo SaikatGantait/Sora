@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+html, body, #__next {
+  height: 100%;
+}
+
+body {
+  @apply bg-bg text-white;
+  background-image: theme('backgroundImage.radial-fade'), theme('backgroundImage.grid-dark');
+  background-size: auto, theme('backgroundSize.grid');
+  background-position: center, top left;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-md px-4 py-2 font-medium transition duration-200;
+}
+.btn-primary {
+  @apply bg-primary text-white hover:bg-primaryHover shadow-soft ring-1 ring-white/5;
+}
+.btn-secondary {
+  @apply bg-panel text-white hover:bg-zinc-800 border border-border;
+}
+.card {
+  @apply bg-panel border border-border rounded-xl shadow-soft;
+}
+.input {
+  @apply w-full rounded-md bg-zinc-900/70 border border-border px-3 py-2 outline-none focus:ring-2 focus:ring-primary/60;
+}
+
+.heading-gradient {
+  background: linear-gradient(90deg, #fff 0%, #a1a1aa 50%, #7c5cff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
