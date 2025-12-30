@@ -1,4 +1,5 @@
-export const getApiBase = () => process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000/api'
+// Default to same-origin and rely on Next.js rewrites to proxy to the backend.
+export const getApiBase = () => process.env.NEXT_PUBLIC_API_BASE || '/api'
 
 export const authFetch = (token: string | null, url: string, init?: RequestInit) => {
   return fetch(url, {

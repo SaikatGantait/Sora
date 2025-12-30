@@ -20,6 +20,7 @@ export default function EditorPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [saveMsg, setSaveMsg] = useState<string>('')
   const [frame, setFrame] = useState<number>(0)
+  const [progress, setProgress] = useState<number>(0)
 
   useEffect(() => {
     // Protect route: if no token, redirect to login
@@ -89,6 +90,7 @@ export default function EditorPage() {
       const res = await authFetch(token, `${getApiBase()}/render/${jobId}`)
       const data = await res.json()
       setStatus(data.status)
+      if (typeof data.progress === 'number') setProgress(data.progress)
       if (data.status === 'completed') {
         setVideoUrl(data.videoUrl)
         clearInterval(t)
@@ -114,6 +116,14 @@ export default function EditorPage() {
           <button className="btn btn-secondary w-full" onClick={onSave}>Save Project</button>
           <button className="btn btn-primary w-full" onClick={onRender}>Render</button>
           <p className="text-sm text-zinc-400">Status: {status}</p>
+          {status === 'processing' && (
+            <div>
+              <div className="h-2 rounded bg-zinc-800 overflow-hidden">
+                <div className="h-2 bg-primary" style={{ width: `${progress}%` }} />
+              </div>
+              <div className="text-xs text-zinc-400 mt-1">{progress}%</div>
+            </div>
+          )}
           {saveMsg && <p className="text-sm text-zinc-300">{saveMsg}</p>}
           {videoUrl && (
             <video className="w-full rounded" controls src={videoUrl} />
