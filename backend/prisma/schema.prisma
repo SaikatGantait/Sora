@@ -33,3 +33,15 @@ model RenderJob {
   videoUrl  String?
   createdAt DateTime @default(now())
 }
+
+model Project {
+  id          String   @id @default(cuid())
+  userId      String
+  templateId  String
+  name        String
+  data        String   // JSON stringified template + edits
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}

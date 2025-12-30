@@ -3,6 +3,8 @@ import { Stage, Layer as KonvaLayer, Rect, Text, Image as KonvaImage } from 'rea
 import useImage from 'use-image'
 import { Layer } from '../lib/types'
 import { useState } from 'react'
+import { useAuth } from '../auth/AuthContext'
+import { getApiBase, authFetch } from '../lib/api'
 
 function DraggableImage({ layer, onChange }: { layer: any; onChange: (p: any)=>void }) {
   const [img] = useImage(layer.src || 'https://placekitten.com/300/300')
@@ -25,6 +27,7 @@ function DraggableImage({ layer, onChange }: { layer: any; onChange: (p: any)=>v
 
 export default function CanvasEditor({ layers, setLayers }: { layers: Layer[]; setLayers: (l: Layer[])=>void }) {
   const [selected, setSelected] = useState<number | null>(null)
+  const { token } = useAuth()
 
   const updateLayer = (idx: number, patch: any) => {
     const next = layers.slice()
@@ -65,6 +68,63 @@ export default function CanvasEditor({ layers, setLayers }: { layers: Layer[]; s
           })}
         </KonvaLayer>
       </Stage>
+      {/* Image layer uploads */}
+      <div className="mt-4 space-y-2">
+        <div className="text-sm font-medium">Replace Images</div>
+        {layers.map((l, i) => l.type === 'image' ? (
+          <div key={i} className="flex items-center gap-3 text-sm">
+            <div className="text-zinc-400">Image Layer #{i+1}</div>
+            <input
+              className="text-xs"
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                try {
+                  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+                  if (cloudName) {
+                    // Ask backend for a signature
+                    const signRes = await authFetch(token, `${getApiBase()}/upload/sign`, { method: 'POST' })
+                    if (signRes.ok) {
+                      const { signature, timestamp, apiKey, folder } = await signRes.json()
+                      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`
+                      const form = new FormData()
+                      form.append('file', file)
+                      form.append('api_key', apiKey)
+                      form.append('timestamp', String(timestamp))
+                      form.append('signature', signature)
+                      form.append('folder', folder || (process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_FOLDER || 'sorastudio'))
+                      const up = await fetch(uploadUrl, { method: 'POST', body: form as any })
+                      if (up.ok) {
+                        const body = await up.json()
+                        const url = body.secure_url || body.url
+                        if (url) {
+                          const next = layers.slice()
+                          next[i] = { ...(next[i] as any), src: url }
+                          setLayers(next)
+                          return
+                        }
+                      }
+                    }
+                  }
+                  // Fallback to backend mock upload
+                  const fd = new FormData()
+                  fd.append('file', file)
+                  const res = await authFetch(token, `${getApiBase()}/upload/image`, { method: 'POST', body: fd as any })
+                  if (!res.ok) return
+                  const data = await res.json()
+                  const next = layers.slice()
+                  next[i] = { ...(next[i] as any), src: data.url }
+                  setLayers(next)
+                } catch (err) {
+                  console.error(err)
+                }
+              }}
+            />
+          </div>
+        ) : null)}
+      </div>
     </div>
   )
 }

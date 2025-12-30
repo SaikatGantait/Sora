@@ -7,6 +7,7 @@ export default function NavBar() {
   return (
     <div className="flex items-center gap-4">
       <Link href="/templates" className="hover:text-accent">Templates</Link>
+      <Link href="/projects" className="hover:text-accent">My Projects</Link>
       <Link href="/creator" className="hover:text-accent">Creator</Link>
       {user ? (
         <>

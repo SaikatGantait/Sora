@@ -6,3 +6,8 @@ export async function uploadVideoMock(_filePath: string): Promise<string> {
   // Pretend upload by returning a unique URL
   return `${SAMPLE_VIDEO}?r=${Date.now()}`
 }
+
+export async function uploadImageMock(_filePath: string): Promise<string> {
+  // Return a placeholder image URL with a varying seed
+  return `https://picsum.photos/seed/${Date.now()}/800/600`
+}
